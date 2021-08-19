@@ -7,9 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import (
-    QtCore, QtGui, QtWidgets
-)
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
@@ -39,8 +37,8 @@ class Ui_MainWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
         self.menubar.setObjectName("menubar")
-        self.menuFile = QtWidgets.QMenu(self.menubar)
-        self.menuFile.setObjectName("menuFile")
+        self.menuConnection = QtWidgets.QMenu(self.menubar)
+        self.menuConnection.setObjectName("menuConnection")
         self.menuMachine = QtWidgets.QMenu(self.menubar)
         self.menuMachine.setObjectName("menuMachine")
         self.menuHelp = QtWidgets.QMenu(self.menubar)
@@ -66,7 +64,13 @@ class Ui_MainWindow(object):
         icon1.addPixmap(QtGui.QPixmap("resources/vm_settings_32px.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionSettings.setIcon(icon1)
         self.actionSettings.setObjectName("actionSettings")
-        self.menubar.addAction(self.menuFile.menuAction())
+        self.actionNew = QtWidgets.QAction(MainWindow)
+        self.actionNew.setObjectName("actionNew")
+        self.actionE_xit = QtWidgets.QAction(MainWindow)
+        self.actionE_xit.setObjectName("actionE_xit")
+        self.menuConnection.addAction(self.actionNew)
+        self.menuConnection.addAction(self.actionE_xit)
+        self.menubar.addAction(self.menuConnection.menuAction())
         self.menubar.addAction(self.menuMachine.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         self.toolBar.addAction(self.actionConnect)
@@ -82,7 +86,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Tab 1"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
-        self.menuFile.setTitle(_translate("MainWindow", "&File"))
+        self.menuConnection.setTitle(_translate("MainWindow", "&Connection"))
         self.menuMachine.setTitle(_translate("MainWindow", "Machine"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
@@ -90,3 +94,5 @@ class Ui_MainWindow(object):
         self.actionConnect.setToolTip(_translate("MainWindow", "Connect to remote vbox host"))
         self.actionSettings.setText(_translate("MainWindow", "Settings"))
         self.actionSettings.setToolTip(_translate("MainWindow", "vm settings"))
+        self.actionNew.setText(_translate("MainWindow", "&New"))
+        self.actionE_xit.setText(_translate("MainWindow", "E&xit"))

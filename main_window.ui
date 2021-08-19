@@ -47,10 +47,12 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="menuConnection">
     <property name="title">
-     <string>&amp;File</string>
+     <string>&amp;Connection</string>
     </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionE_xit"/>
    </widget>
    <widget class="QMenu" name="menuMachine">
     <property name="title">
@@ -62,7 +64,7 @@
      <string>Help</string>
     </property>
    </widget>
-   <addaction name="menuFile"/>
+   <addaction name="menuConnection"/>
    <addaction name="menuMachine"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -119,6 +121,16 @@
    </property>
    <property name="toolTip">
     <string>vm settings</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>&amp;New</string>
+   </property>
+  </action>
+  <action name="actionE_xit">
+   <property name="text">
+    <string>E&amp;xit</string>
    </property>
   </action>
  </widget>
