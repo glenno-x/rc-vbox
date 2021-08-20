@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow
 )
+import subprocess
+# import sys
 
 # Only needed for access to command line arguments
 # import sys
@@ -42,8 +44,12 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
     def slot_connection_dialog(self):
         dialog = ConnectionDialog(self)
         if dialog.exec():
-            self.cmd_prefix = 'ssh ' + dialog.lineEdit_user.text() + '@' + dialog.lineEdit_machine.text()
-            print(self.cmd_prefix)
+            self.cmd_prefix = dialog.lineEdit_user.text() + '@' + dialog.lineEdit_machine.text()
+            # print(self.cmd_prefix)
+            r_args = ['ssh', self.cmd_prefix, 'VBoxManage', 'list', 'vms']
+            result = subprocess.run(r_args, capture_output=True, text=True)
+            print(result.stdout)
+
             # msg = QMessageBox.NoIcon(self, 'Output', cmd_str)
             # msg.exec()
 
