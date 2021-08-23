@@ -46,10 +46,20 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         if dialog.exec():
             self.cmd_prefix = dialog.lineEdit_user.text() + '@' + dialog.lineEdit_machine.text()
             # print(self.cmd_prefix)
-            r_args = ['ssh', self.cmd_prefix, 'VBoxManage', 'list', 'vms']
-            result = subprocess.run(r_args, capture_output=True, text=True)
+            # r_args = ['ssh', self.cmd_prefix, 'VBoxManage', 'list', 'vms']
+            r2_args = ['lsblk']
+            result = subprocess.run(r2_args, capture_output=True, text=True)
             print(result.stdout)
-
+            vm_dict = {}
+            for line in result.stdout.splitlines():
+                items = line.split()
+                if len(items) > 1:
+                    # key, value = items
+                    # vm_dict[key] = value
+                    vm_dict[items[0]] = items[1]
+                    self.listWidget.addItem(items[0])
+            # vm_list=result.stdout
+            print(vm_dict)
             # msg = QMessageBox.NoIcon(self, 'Output', cmd_str)
             # msg.exec()
 
