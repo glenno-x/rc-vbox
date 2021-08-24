@@ -33,22 +33,21 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
     cmd_prefix = property(get_cmd_prefix, set_cmd_prefix)
 
     def connect_signals_slots(self):
-        self.actionNew.triggered.connect(self.slot_connection_dialog)
-        self.actionConnect.triggered.connect(self.slot_connection_dialog)
+        self.actionConnect.triggered.connect(self.connection_dialog)
         self.actionE_xit.triggered.connect(self.close)
         '''
         self.action_Find_Replace.triggered.connect(self.findAndReplace)
         self.action_About.triggered.connect(self.about)
         '''
 
-    def slot_connection_dialog(self):
+    def connection_dialog(self):
         dialog = ConnectionDialog(self)
         if dialog.exec():
             self.cmd_prefix = dialog.lineEdit_user.text() + '@' + dialog.lineEdit_machine.text()
-            # print(self.cmd_prefix)
-            # r_args = ['ssh', self.cmd_prefix, 'VBoxManage', 'list', 'vms']
-            r2_args = ['lsblk']
-            result = subprocess.run(r2_args, capture_output=True, text=True)
+            # TODO:  Save the user/server pair as config
+            r_args = ['ssh', self.cmd_prefix, 'VBoxManage', 'list', 'vms']
+            # r2_args = ['lsblk']
+            result = subprocess.run(r_args, capture_output=True, text=True)
             print(result.stdout)
             vm_dict = {}
             for line in result.stdout.splitlines():
@@ -58,17 +57,14 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
                     # vm_dict[key] = value
                     vm_dict[items[0]] = items[1]
                     self.listWidget.addItem(items[0])
-            # vm_list=result.stdout
             print(vm_dict)
-            # msg = QMessageBox.NoIcon(self, 'Output', cmd_str)
-            # msg.exec()
 
 
 # You need one (and only one) QApplication instance per application.
 # Pass in sys.argv to allow command line arguments for your app.
 # If you know you won't use command line arguments QApplication([]) works too.
 app = QApplication([])
-
+app.setApplicationDisplayName('rc-vbox')
 
 # Create a Qt widget, which will be our window.
 window = AppMainWindow()

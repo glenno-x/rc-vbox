@@ -2,13 +2,11 @@
 
 # Form implementation generated from reading ui file 'main_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -35,7 +33,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 24))
         self.menubar.setObjectName("menubar")
         self.menuConnection = QtWidgets.QMenu(self.menubar)
         self.menuConnection.setObjectName("menuConnection")
@@ -59,17 +57,52 @@ class Ui_MainWindow(object):
         self.actionConnect.setIcon(icon)
         self.actionConnect.setObjectName("actionConnect")
         self.actionSettings = QtWidgets.QAction(MainWindow)
-        self.actionSettings.setCheckable(True)
+        self.actionSettings.setCheckable(False)
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap("resources/vm_settings_32px.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionSettings.setIcon(icon1)
         self.actionSettings.setObjectName("actionSettings")
-        self.actionNew = QtWidgets.QAction(MainWindow)
-        self.actionNew.setObjectName("actionNew")
         self.actionE_xit = QtWidgets.QAction(MainWindow)
         self.actionE_xit.setObjectName("actionE_xit")
-        self.menuConnection.addAction(self.actionNew)
+        self.actionStart = QtWidgets.QAction(MainWindow)
+        self.actionStart.setCheckable(False)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap("resources/vm_start_32px.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionStart.setIcon(icon2)
+        self.actionStart.setObjectName("actionStart")
+        self.actionPause = QtWidgets.QAction(MainWindow)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap("resources/vm_pause_16px.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionPause.setIcon(icon3)
+        self.actionPause.setObjectName("actionPause")
+        self.actionStop = QtWidgets.QAction(MainWindow)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap("resources/stop_32px.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionStop.setIcon(icon4)
+        self.actionStop.setObjectName("actionStop")
+        self.actionSave = QtWidgets.QAction(MainWindow)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap("resources/vm_save_state_16px.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionSave.setIcon(icon5)
+        self.actionSave.setObjectName("actionSave")
+        self.actionSleep = QtWidgets.QAction(MainWindow)
+        self.actionSleep.setIcon(icon3)
+        self.actionSleep.setObjectName("actionSleep")
+        self.actionShutdown = QtWidgets.QAction(MainWindow)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap("resources/vm_shutdown_16px.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionShutdown.setIcon(icon6)
+        self.actionShutdown.setObjectName("actionShutdown")
+        self.menuConnection.addAction(self.actionConnect)
         self.menuConnection.addAction(self.actionE_xit)
+        self.menuMachine.addSeparator()
+        self.menuMachine.addAction(self.actionStart)
+        self.menuMachine.addAction(self.actionPause)
+        self.menuMachine.addAction(self.actionStop)
+        self.menuMachine.addAction(self.actionSave)
+        self.menuMachine.addSeparator()
+        self.menuMachine.addAction(self.actionSleep)
+        self.menuMachine.addAction(self.actionShutdown)
         self.menubar.addAction(self.menuConnection.menuAction())
         self.menubar.addAction(self.menuMachine.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
@@ -77,8 +110,12 @@ class Ui_MainWindow(object):
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionSettings)
         self.toolBar.addSeparator()
+        self.toolBar.addAction(self.actionStart)
+        self.toolBar.addAction(self.actionStop)
+        self.toolBar.addSeparator()
 
         self.retranslateUi(MainWindow)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -94,5 +131,11 @@ class Ui_MainWindow(object):
         self.actionConnect.setToolTip(_translate("MainWindow", "Connect to remote vbox host"))
         self.actionSettings.setText(_translate("MainWindow", "Settings"))
         self.actionSettings.setToolTip(_translate("MainWindow", "vm settings"))
-        self.actionNew.setText(_translate("MainWindow", "&New"))
         self.actionE_xit.setText(_translate("MainWindow", "E&xit"))
+        self.actionStart.setText(_translate("MainWindow", "Start"))
+        self.actionPause.setText(_translate("MainWindow", "Pause"))
+        self.actionStop.setText(_translate("MainWindow", "Power-off"))
+        self.actionSave.setText(_translate("MainWindow", "Save state"))
+        self.actionSleep.setText(_translate("MainWindow", "ACPI - Sleep"))
+        self.actionShutdown.setText(_translate("MainWindow", "ACPI - Shutdown"))
+
