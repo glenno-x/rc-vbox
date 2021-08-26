@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow
+    QApplication, QDialog, QMainWindow, QMessageBox
 )
 import subprocess
 # import sys
@@ -8,7 +8,7 @@ import subprocess
 # import sys
 
 from main_window import Ui_MainWindow
-from connecton_dialog import Ui_ConnectionDialog
+from connection_dialog import Ui_ConnectionDialog
 
 
 class ConnectionDialog(QDialog, Ui_ConnectionDialog):
@@ -35,20 +35,25 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
     def connect_signals_slots(self):
         self.actionConnect.triggered.connect(self.connection_dialog)
         self.actionE_xit.triggered.connect(self.close)
+        self.actionStart.triggered.connect(self.start_vm)
         '''
         self.action_Find_Replace.triggered.connect(self.findAndReplace)
         self.action_About.triggered.connect(self.about)
         '''
 
     def connection_dialog(self):
+        r_args = []
         dialog = ConnectionDialog(self)
         if dialog.exec():
-            self.cmd_prefix = dialog.lineEdit_user.text() + '@' + dialog.lineEdit_machine.text()
+            if dialog.lineEdit_user.text() and dialog.lineEdit_machine.text():
+                self.cmd_prefix = dialog.lineEdit_user.text() + '@' + dialog.lineEdit_machine.text()
+            else:
+                self.cmd_prefix = None
             # TODO:  Save the user/server pair as config
-            r_args = ['ssh', self.cmd_prefix, 'VBoxManage', 'list', 'vms']
-            # r2_args = ['lsblk']
+            if self.cmd_prefix:
+                r_args.extend(['ssh', self.cmd_prefix])
+            r_args.extend(['VBoxManage', 'list', 'vms'])
             result = subprocess.run(r_args, capture_output=True, text=True)
-            print(result.stdout)
             vm_dict = {}
             for line in result.stdout.splitlines():
                 items = line.split()
@@ -56,8 +61,31 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
                     # key, value = items
                     # vm_dict[key] = value
                     vm_dict[items[0]] = items[1]
-                    self.listWidget.addItem(items[0])
-            print(vm_dict)
+                    self.listWidget.addItem(items[0].strip('"'))    # strip double-quotes
+
+    def start_vm(self):
+        # get selected vm
+        if self.listWidget.selectedItems():
+            selected_vm = self.listWidget.selectedItems()[0].text()
+        else:
+            # TODO: msgbox to say select a vm to start!
+            return
+        r_args = []
+        options = []
+        if self.cmd_prefix:
+            r_args.extend(['ssh', self.cmd_prefix])
+            options = ['--type', 'headless']
+        r_args.extend(['VBoxManage', 'startvm', selected_vm])
+        if options:
+            r_args.extend(options)
+        # print(r_args)
+        mbox = QMessageBox(self)
+        try:
+            result = subprocess.run(r_args, capture_output=True, check=True, text=True, timeout=30)
+            mbox.setText(result.stdout)
+        except subprocess.CalledProcessError as err:
+            mbox.setText(err.__str__())
+        mbox.exec()
 
 
 # You need one (and only one) QApplication instance per application.
@@ -71,7 +99,7 @@ window = AppMainWindow()
 window.show()  # IMPORTANT!!!!! Windows are hidden by default.
 
 # Start the event loop.
-app.exec_()
+app.exec()
 
 
 # Your application won't reach here until you exit and the event
