@@ -106,10 +106,11 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         mbox = QMessageBox(self)
         try:
             result = subprocess.run(r_args, capture_output=True, check=True, text=True, timeout=30)
-            mbox.setText(result.stdout + '\n' + result.stderr + '\n'+ selected_vm + ' stopped.')
+            mbox.setText(result.stdout + '\n' + result.stderr + '\n' + selected_vm + ' stopped.')
         except subprocess.CalledProcessError as err:
             mbox.setText(err.__str__())
         mbox.exec()
+
 
 # You need one (and only one) QApplication instance per application.
 # Pass in sys.argv to allow command line arguments for your app.
