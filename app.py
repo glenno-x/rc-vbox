@@ -36,6 +36,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.actionConnect.triggered.connect(self.connection_dialog)
         self.actionE_xit.triggered.connect(self.close)
         self.actionStart.triggered.connect(self.start_vm)
+        self.actionStop.triggered.connect(self.stop_vm)
         '''
         self.action_Find_Replace.triggered.connect(self.findAndReplace)
         self.action_About.triggered.connect(self.about)
@@ -68,7 +69,9 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         if self.listWidget.selectedItems():
             selected_vm = self.listWidget.selectedItems()[0].text()
         else:
-            # TODO: msgbox to say select a vm to start!
+            mbox = QMessageBox(self)
+            mbox.setText('No vm selected.')
+            mbox.exec()
             return
         r_args = []
         options = []
@@ -87,6 +90,26 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
             mbox.setText(err.__str__())
         mbox.exec()
 
+    def stop_vm(self):
+        # get selected vm
+        if self.listWidget.selectedItems():
+            selected_vm = self.listWidget.selectedItems()[0].text()
+        else:
+            mbox = QMessageBox(self)
+            mbox.setText('No vm selected.')
+            mbox.exec()
+            return
+        r_args = []
+        if self.cmd_prefix:
+            r_args.extend(['ssh', self.cmd_prefix])
+        r_args.extend(['VBoxManage', 'controlvm', selected_vm, 'poweroff'])
+        mbox = QMessageBox(self)
+        try:
+            result = subprocess.run(r_args, capture_output=True, check=True, text=True, timeout=30)
+            mbox.setText(result.stdout + '\n' + result.stderr + '\n'+ selected_vm + ' stopped.')
+        except subprocess.CalledProcessError as err:
+            mbox.setText(err.__str__())
+        mbox.exec()
 
 # You need one (and only one) QApplication instance per application.
 # Pass in sys.argv to allow command line arguments for your app.
