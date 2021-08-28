@@ -15,8 +15,8 @@ class ConnectionDialog(QDialog, Ui_ConnectionDialog):
     def __init__(self, parent, default_user, default_machine):
         super().__init__(parent)
         self.setupUi(self)
-        self.lineEdit_user.setPlaceholderText(default_user)
-        self.lineEdit_machine.setPlaceholderText(default_machine)
+        self.lineEdit_user.setText(default_user)
+        self.lineEdit_machine.setText(default_machine)
 
 
 class AppMainWindow(QMainWindow, Ui_MainWindow):
@@ -50,15 +50,14 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
 
         # Detect and load config.ini
         try:
-            with open(CONFIG_FILE) as file:
-                config.read(file)
+            config.read(CONFIG_FILE)
         except FileNotFoundError:
-            pass
-        if not ('connection' in config):
-            config['connection'] = {'user': '', 'machine': ''}
-        sub_config = config['connection']
-        config_user = sub_config['user']
-        config_machine = sub_config['machine']
+            config['DEFAULT'] = {'user': '', 'machine': ''}
+        #if not ('connection' in config):
+        #   config['connection'] = {'user': '', 'machine': ''}
+        #sub_config = config['DEFAULT']
+        config_user = config['DEFAULT']['user']
+        config_machine = config['DEFAULT']['machine']
 
         dialog = ConnectionDialog(self, config_user, config_machine)
         if dialog.exec():
@@ -68,8 +67,8 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
                 self.cmd_prefix = None
 
             # Save the connection config
-            config['connection']['user'] = dialog.lineEdit_user.text()
-            config['connection']['machine'] = dialog.lineEdit_machine.text()
+            config['DEFAULT']['user'] = dialog.lineEdit_user.text()
+            config['DEFAULT']['machine'] = dialog.lineEdit_machine.text()
             try:
                 with open(CONFIG_FILE, 'wt') as file:
                     config.write(file)
