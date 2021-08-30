@@ -29,39 +29,30 @@
          <attribute name="title">
           <string>Tab 1</string>
          </attribute>
-         <widget class="QScrollArea" name="scrollArea">
-          <property name="geometry">
-           <rect>
-            <x>39</x>
-            <y>39</y>
-            <width>301</width>
-            <height>311</height>
-           </rect>
-          </property>
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>299</width>
-             <height>309</height>
-            </rect>
-           </property>
-           <widget class="QListView" name="listView">
-            <property name="geometry">
-             <rect>
-              <x>40</x>
-              <y>50</y>
-              <width>256</width>
-              <height>192</height>
-             </rect>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QScrollArea" name="scrollArea">
+            <property name="widgetResizable">
+             <bool>true</bool>
             </property>
+            <widget class="QWidget" name="scrollAreaWidgetContents">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>363</width>
+               <height>409</height>
+              </rect>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QListView" name="listView_settings"/>
+              </item>
+             </layout>
+            </widget>
            </widget>
-          </widget>
-         </widget>
+          </item>
+         </layout>
         </widget>
         <widget class="QWidget" name="tab_2">
          <attribute name="title">

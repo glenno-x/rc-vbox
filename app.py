@@ -1,6 +1,9 @@
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QMessageBox
 )
+from PyQt5.QtCore import (
+    Qt, QAbstractListModel
+)
 import subprocess
 from configparser import ConfigParser
 # Only needed for access to command line arguments
@@ -9,6 +12,25 @@ from main_window import Ui_MainWindow
 from connection_dialog import Ui_ConnectionDialog
 
 CONFIG_FILE = 'rc-vbox.ini'
+
+
+class SettingsModel(QAbstractListModel):
+    def __init__(self, *args, settings=None, **kwargs):
+        super(SettingsModel, self).__init__(*args, **kwargs)
+        self.settings = settings or []
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            label, text = self.settings[index.row()]
+            return label + ' : ' + text
+        '''
+        if role == Qt.DecorationRole:
+            label, _ = self.settings[index.row()]
+            return label
+        '''
+
+    def rowCount(self, index):
+        return len(self.settings)
 
 
 class ConnectionDialog(QDialog, Ui_ConnectionDialog):
@@ -25,6 +47,9 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self._cmd_prefix = ''
         self.setupUi(self)
         self.connect_signals_slots()
+        self.model = SettingsModel()
+        # optionally load the model here, before linking to the view widget
+        self.listView_settings.setModel(self.model)
 
     def get_cmd_prefix(self):
         return self._cmd_prefix
@@ -153,6 +178,10 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
                 items = line.split(':')
                 if len(items) == 2:
                     settings_dict[items[0]] = items[1].strip()
+                    # update the model list with a new key+value tuple
+                    self.model.settings.append((items[0], items[1].strip()))
+            # Trigger refresh.
+            self.model.layoutChanged.emit()
             print(settings_dict)
 
         except subprocess.CalledProcessError as err:
