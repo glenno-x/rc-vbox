@@ -39,10 +39,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.actionE_xit.triggered.connect(self.close)
         self.actionStart.triggered.connect(self.start_vm)
         self.actionStop.triggered.connect(self.stop_vm)
-        '''
-        self.action_Find_Replace.triggered.connect(self.findAndReplace)
-        self.action_About.triggered.connect(self.about)
-        '''
+        self.actionSettings.triggered.connect(self.load_settings)
 
     def connection_dialog(self):
         r_args = []
@@ -50,12 +47,10 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
 
         # Detect and load config.ini
         try:
-            config.read(CONFIG_FILE)
+            with open(CONFIG_FILE, 'r') as file:
+                config.read_file(file)
         except FileNotFoundError:
             config['DEFAULT'] = {'user': '', 'machine': ''}
-        #if not ('connection' in config):
-        #   config['connection'] = {'user': '', 'machine': ''}
-        #sub_config = config['DEFAULT']
         config_user = config['DEFAULT']['user']
         config_machine = config['DEFAULT']['machine']
 
@@ -79,24 +74,35 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
             if self.cmd_prefix:
                 r_args.extend(['ssh', self.cmd_prefix])
             r_args.extend(['VBoxManage', 'list', 'vms'])
-            result = subprocess.run(r_args, capture_output=True, text=True)
-            vm_dict = {}
-            for line in result.stdout.splitlines():
-                items = line.split()
-                if len(items) > 1:
-                    # key, value = items
-                    # vm_dict[key] = value
-                    vm_dict[items[0]] = items[1]
-                    self.listWidget.addItem(items[0].strip('"'))    # strip double-quotes
+            try:
+                result = subprocess.run(r_args, capture_output=True, check=True, text=True)
+                vm_dict = {}
+                for line in result.stdout.splitlines():
+                    items = line.split()
+                    if len(items) > 1:
+                        # key, value = items
+                        # vm_dict[key] = value
+                        vm_dict[items[0]] = items[1]
+                        self.listWidget.addItem(items[0].strip('"'))    # strip double-quotes
+            except subprocess.CalledProcessError as err:
+                mbox = QMessageBox(self)
+                mbox.setText(err.__str__())
+                mbox.exec()
 
-    def start_vm(self):
+    def get_selected_vm(self):
         # get selected vm
         if self.listWidget.selectedItems():
             selected_vm = self.listWidget.selectedItems()[0].text()
+            return selected_vm
         else:
             mbox = QMessageBox(self)
             mbox.setText('No vm selected.')
             mbox.exec()
+            return None
+
+    def start_vm(self):
+        selected_vm = self.get_selected_vm()
+        if not selected_vm:
             return
         r_args = []
         options = []
@@ -116,13 +122,8 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         mbox.exec()
 
     def stop_vm(self):
-        # get selected vm
-        if self.listWidget.selectedItems():
-            selected_vm = self.listWidget.selectedItems()[0].text()
-        else:
-            mbox = QMessageBox(self)
-            mbox.setText('No vm selected.')
-            mbox.exec()
+        selected_vm = self.get_selected_vm()
+        if not selected_vm:
             return
         r_args = []
         if self.cmd_prefix:
@@ -135,6 +136,29 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         except subprocess.CalledProcessError as err:
             mbox.setText(err.__str__())
         mbox.exec()
+
+    def load_settings(self):
+        selected_vm = self.get_selected_vm()
+        if not selected_vm:
+            return
+        r_args = []
+        if self.cmd_prefix:
+            r_args.extend(['ssh', self.cmd_prefix])
+        r_args.extend(['VBoxManage', 'showvminfo', selected_vm])
+        try:
+            result = subprocess.run(r_args, capture_output=True, check=True, text=True)
+            # populate the dictionary
+            settings_dict = {}
+            for line in result.stdout.splitlines():
+                items = line.split(':')
+                if len(items) == 2:
+                    settings_dict[items[0]] = items[1].strip()
+            print(settings_dict)
+
+        except subprocess.CalledProcessError as err:
+            mbox = QMessageBox(self)
+            mbox.setText(err.__str__())
+            mbox.exec()
 
 
 # You need one (and only one) QApplication instance per application.
