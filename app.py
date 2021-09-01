@@ -13,7 +13,8 @@ from main_window import Ui_MainWindow
 from connection_dialog import Ui_ConnectionDialog
 
 CONFIG_FILE = 'rc-vbox.ini'
-MONO_FONT = QFont('Arundin Sans Mono',10)
+MONO_FONT = QFont('Arundin Sans Mono', 10)
+
 
 class SettingsModel(QAbstractListModel):
     def __init__(self, *args, settings=None, **kwargs):
