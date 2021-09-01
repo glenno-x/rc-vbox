@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import (
     Qt, QAbstractListModel
 )
+from PyQt5.QtGui import QFont
 import subprocess
 from configparser import ConfigParser
 # Only needed for access to command line arguments
@@ -12,7 +13,7 @@ from main_window import Ui_MainWindow
 from connection_dialog import Ui_ConnectionDialog
 
 CONFIG_FILE = 'rc-vbox.ini'
-
+MONO_FONT = QFont('Arundin Sans Mono',10)
 
 class SettingsModel(QAbstractListModel):
     def __init__(self, *args, settings=None, **kwargs):
@@ -112,6 +113,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
             except subprocess.CalledProcessError as err:
                 mbox = QMessageBox(self)
                 mbox.setText(err.__str__())
+                mbox.setFont(MONO_FONT)
                 mbox.exec()
 
     def get_selected_vm(self):
@@ -144,6 +146,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
             mbox.setText(result.stdout)
         except subprocess.CalledProcessError as err:
             mbox.setText(err.__str__())
+        mbox.setFont(MONO_FONT)
         mbox.exec()
 
     def stop_vm(self):
@@ -160,6 +163,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
             mbox.setText(result.stdout + '\n' + result.stderr + '\n' + selected_vm + ' stopped.')
         except subprocess.CalledProcessError as err:
             mbox.setText(err.__str__())
+        mbox.setFont(MONO_FONT)
         mbox.exec()
 
     def load_settings(self):
@@ -172,21 +176,23 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         r_args.extend(['VBoxManage', 'showvminfo', selected_vm])
         try:
             result = subprocess.run(r_args, capture_output=True, check=True, text=True)
-            # populate the dictionary
+            # reset and populate the dictionary
             settings_dict = {}
+            self.model.settings.clear()
             for line in result.stdout.splitlines():
                 items = line.split(':')
                 if len(items) == 2:
                     settings_dict[items[0]] = items[1].strip()
                     # update the model list with a new key+value tuple
                     self.model.settings.append((items[0], items[1].strip()))
-            # Trigger refresh.
+            # Trigger gui refresh.
             self.model.layoutChanged.emit()
             print(settings_dict)
 
         except subprocess.CalledProcessError as err:
             mbox = QMessageBox(self)
             mbox.setText(err.__str__())
+            mbox.setFont(MONO_FONT)
             mbox.exec()
 
 
