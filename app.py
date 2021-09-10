@@ -174,14 +174,14 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         r_args = []
         if self.cmd_prefix:
             r_args.extend(['ssh', self.cmd_prefix])
-        r_args.extend(['VBoxManage', 'showvminfo', selected_vm])
+        r_args.extend(['VBoxManage', 'showvminfo', '--machinereadable', selected_vm])
         try:
             result = subprocess.run(r_args, capture_output=True, check=True, text=True)
             # reset and populate the dictionary
             settings_dict = {}
             self.model.settings.clear()
             for line in result.stdout.splitlines():
-                items = line.split(':')
+                items = line.split('=')
                 if len(items) == 2:
                     settings_dict[items[0]] = items[1].strip()
                     # update the model list with a new key+value tuple
