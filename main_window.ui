@@ -58,7 +58,7 @@
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QListView" name="listView_settings">
+               <widget class="QTableView" name="tableView_settings">
                 <property name="font">
                  <font>
                   <family>Arundina Sans Mono</family>

@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow, QMessageBox
+    QApplication, QDialog, QMainWindow, QMessageBox, QTableView
 )
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QStandardItemModel, QStandardItem
+from PyQt5.QtCore import QModelIndex
 import subprocess
 from configparser import ConfigParser
 # Only needed for access to command line arguments
@@ -28,9 +29,10 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self._cmd_prefix = ''
         self.setupUi(self)
         self.connect_signals_slots()
-        self.model = SettingsModel()
-        # optionally load the model here, before linking to the view widget
-        self.listView_settings.setModel(self.model)
+        # self.model = SettingsModel()
+        self.model = QStandardItemModel(1, 2, self)
+        # self.listView_settings.setModel(self.model)
+        self.tableView_settings.setModel(self.model)
 
     def get_cmd_prefix(self):
         return self._cmd_prefix
@@ -158,13 +160,21 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
             result = subprocess.run(r_args, capture_output=True, check=True, text=True)
             # reset and populate the dictionary
             settings_dict = {}
-            self.model.settings.clear()
+            self.model.clear()
+            row = 0
             for line in result.stdout.splitlines():
                 items = line.split('=')
                 if len(items) == 2:
-                    settings_dict[items[0]] = items[1].strip()
+                    items[1] = items[1].strip()
+                    settings_dict[items[0]] = items[1]
                     # update the model list with a new key+value tuple
-                    self.model.settings.append((items[0], items[1].strip()))
+                    # self.model.settings.append((items[0], items[1].strip()))
+                    self.model.insertRows(row, 1, QModelIndex())
+                    # row = self.model.rowCount(QModelIndex()) - 1
+                    row = row + 1
+                    self.model.setData(self.model.index(row, 0, QModelIndex()), items[0])
+                    self.model.setData(self.model.index(row, 1, QModelIndex()), items[1])
+
             # Trigger gui refresh.
             self.model.layoutChanged.emit()
             print(settings_dict)
