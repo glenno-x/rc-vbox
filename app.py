@@ -1,9 +1,6 @@
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QMessageBox
 )
-from PyQt5.QtCore import (
-    Qt, QAbstractListModel
-)
 from PyQt5.QtGui import QFont
 import subprocess
 from configparser import ConfigParser
@@ -11,28 +8,10 @@ from configparser import ConfigParser
 # import sys
 from main_window import Ui_MainWindow
 from connection_dialog import Ui_ConnectionDialog
+from model import SettingsModel
 
 CONFIG_FILE = 'rc-vbox.ini'
 MONO_FONT = QFont('Arundin Sans Mono', 10)
-
-
-class SettingsModel(QAbstractListModel):
-    def __init__(self, *args, settings=None, **kwargs):
-        super(SettingsModel, self).__init__(*args, **kwargs)
-        self.settings = settings or []
-
-    def data(self, index, role):
-        if role == Qt.DisplayRole:
-            label, text = self.settings[index.row()]
-            return label + ' : ' + text
-        '''
-        if role == Qt.DecorationRole:
-            label, _ = self.settings[index.row()]
-            return label
-        '''
-
-    def rowCount(self, index):
-        return len(self.settings)
 
 
 class ConnectionDialog(QDialog, Ui_ConnectionDialog):
