@@ -1,15 +1,13 @@
 from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow, QMessageBox, QTableView
+    QApplication, QDialog, QMainWindow, QMessageBox
 )
 from PyQt5.QtGui import QFont, QStandardItemModel, QStandardItem
-from PyQt5.QtCore import QModelIndex
 import subprocess
 from configparser import ConfigParser
 # Only needed for access to command line arguments
 # import sys
 from main_window import Ui_MainWindow
 from connection_dialog import Ui_ConnectionDialog
-from model import SettingsModel
 
 CONFIG_FILE = 'rc-vbox.ini'
 MONO_FONT = QFont('Arundin Sans Mono', 10)
@@ -161,23 +159,20 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
             # reset and populate the dictionary
             settings_dict = {}
             self.model.clear()
-            row = 0
             for line in result.stdout.splitlines():
+                # q_items = [None, None]  not needed when using list comprehensions
                 items = line.split('=')
                 if len(items) == 2:
                     items[1] = items[1].strip()
                     settings_dict[items[0]] = items[1]
                     # update the model list with a new key+value tuple
-                    # self.model.settings.append((items[0], items[1].strip()))
-                    self.model.insertRows(row, 1, QModelIndex())
-                    # row = self.model.rowCount(QModelIndex()) - 1
-                    row = row + 1
-                    self.model.setData(self.model.index(row, 0, QModelIndex()), items[0])
-                    self.model.setData(self.model.index(row, 1, QModelIndex()), items[1])
-
+                    # q_items[0] = QStandardItem(items[0])
+                    # q_items[1] = QStandardItem(items[1])
+                    q_items = [QStandardItem(items[i]) for i in range(2)]
+                    self.model.appendRow(q_items)
             # Trigger gui refresh.
-            self.model.layoutChanged.emit()
-            print(settings_dict)
+            # self.model.DataChanged.emit(start_idx, idx)
+            # print(settings_dict)
 
         except subprocess.CalledProcessError as err:
             mbox = QMessageBox(self)

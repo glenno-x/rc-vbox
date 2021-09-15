@@ -51,6 +51,11 @@ class Ui_MainWindow(object):
         font.setFamily("Arundina Sans Mono")
         self.tableView_settings.setFont(font)
         self.tableView_settings.setObjectName("tableView_settings")
+        self.tableView_settings.horizontalHeader().setVisible(False)
+        self.tableView_settings.horizontalHeader().setCascadingSectionResizes(True)
+        self.tableView_settings.horizontalHeader().setDefaultSectionSize(200)
+        self.tableView_settings.horizontalHeader().setStretchLastSection(True)
+        self.tableView_settings.verticalHeader().setVisible(False)
         self.horizontalLayout_3.addWidget(self.tableView_settings)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.horizontalLayout_2.addWidget(self.scrollArea)
@@ -150,7 +155,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Tab 1"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Settings"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
         self.menuConnection.setTitle(_translate("MainWindow", "&Connection"))
         self.menuMachine.setTitle(_translate("MainWindow", "Machine"))
