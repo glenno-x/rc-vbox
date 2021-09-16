@@ -50,6 +50,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.actionStop.triggered.connect(self.stop_vm)
         self.actionSettings.triggered.connect(self.load_settings)
         self.tableWidget_settings.itemChanged.connect(self.tag_settings)
+        self.pushButton_apply.pressed.connect(self.change_settings)
 
     def connection_dialog(self):
         r_args = []
@@ -152,6 +153,30 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
 
     def tag_settings(self, item: QTableWidgetItem):
         item.setForeground(Qt.red)
+
+    def change_settings(self):
+        rows = self.tableWidget_settings.rowCount()
+        selected_vm = self.get_selected_vm()
+        if not selected_vm:
+            return
+        r_args = []
+        if self.cmd_prefix:
+            r_args.extend(['ssh', self.cmd_prefix])
+        r_args.extend(['VBoxManage', 'modifyvm', selected_vm])
+        for i in range(rows):
+            if self.tableWidget_settings.item(i, 1).foreground() == Qt.red:
+                # update the setting for the vm
+                r_args.extend(['--'+self.tableWidget_settings.item(i, 0).text(),
+                               self.tableWidget_settings.item(i, 1).text()])
+        try:
+            subprocess.run(r_args, capture_output=True, check=True, text=True, timeout=30)
+            # mbox.setText(result.stdout + '\n' + result.stderr + '\n' + selected_vm + ' stopped.')
+        except subprocess.CalledProcessError as err:
+            # mbox.setText(err.__str__())
+            print(err)
+            pass
+        # refresh table
+        self.load_settings()
 
     def load_settings(self):
         self.tableWidget_settings.itemChanged.disconnect(self.tag_settings)
