@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow, QMessageBox
+    QApplication, QDialog, QMainWindow, QMessageBox, QTableWidgetItem
 )
 from PyQt5.QtGui import (
-    QFont, QStandardItemModel, QStandardItem
+    QFont
 )
 from PyQt5.QtCore import Qt
 import subprocess
@@ -31,9 +31,9 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.connect_signals_slots()
         # self.model = SettingsModel()
-        self.model = QStandardItemModel(1, 2, self)
+        # self.model = QStandardItemModel(1, 2, self)
         # self.listView_settings.setModel(self.model)
-        self.tableView_settings.setModel(self.model)
+        # self.tableView_settings.setModel(self.model)
 
     def get_cmd_prefix(self):
         return self._cmd_prefix
@@ -49,6 +49,7 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         self.actionStart.triggered.connect(self.start_vm)
         self.actionStop.triggered.connect(self.stop_vm)
         self.actionSettings.triggered.connect(self.load_settings)
+        self.tableWidget_settings.itemChanged.connect(self.tag_settings)
 
     def connection_dialog(self):
         r_args = []
@@ -149,7 +150,11 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         mbox.setFont(MONO_FONT)
         mbox.exec()
 
+    def tag_settings(self, item: QTableWidgetItem):
+        item.setForeground(Qt.red)
+
     def load_settings(self):
+        self.tableWidget_settings.itemChanged.disconnect(self.tag_settings)
         selected_vm = self.get_selected_vm()
         if not selected_vm:
             return
@@ -159,27 +164,28 @@ class AppMainWindow(QMainWindow, Ui_MainWindow):
         r_args.extend(['VBoxManage', 'showvminfo', '--machinereadable', selected_vm])
         try:
             result = subprocess.run(r_args, capture_output=True, check=True, text=True)
-            # reset and populate the dictionary
-            settings_dict = {}
-            self.model.clear()
+            self.tableWidget_settings.clear()
+            self.tableWidget_settings.setRowCount(0)
+            self.tableWidget_settings.setColumnCount(2)
             for line in result.stdout.splitlines():
                 items = line.split('=')
                 if len(items) == 2:
                     items[1] = items[1].strip()
-                    settings_dict[items[0]] = items[1]
-                    # update the model list with a new key+value tuple
-                    q_items = [QStandardItem(items[i]) for i in range(2)]
-                    q_items[0].setFlags(q_items[0].flags() & ~Qt.ItemIsEditable)
-                    self.model.appendRow(q_items)
-            # Trigger gui refresh.
-            # self.model.DataChanged.emit(start_idx, idx)
-            # print(settings_dict)
+                    q_items = [QTableWidgetItem(items[i]) for i in range(2)]
+                    q_items[0].setFlags(Qt.ItemIsEditable)
+                    # self.model.appendRow(q_items)
+                    rows = self.tableWidget_settings.rowCount()
+                    self.tableWidget_settings.insertRow(rows)
+                    self.tableWidget_settings.setItem(rows, 0, q_items[0])
+                    self.tableWidget_settings.setItem(rows, 1, q_items[1])
 
         except subprocess.CalledProcessError as err:
             mbox = QMessageBox(self)
             mbox.setText(err.__str__())
             mbox.setFont(MONO_FONT)
             mbox.exec()
+
+        self.tableWidget_settings.itemChanged.connect(self.tag_settings)
 
 
 # You need one (and only one) QApplication instance per application.
